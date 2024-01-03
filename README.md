@@ -7,8 +7,8 @@ This 42 project is about writing your own **HyperText Transfer Protocol** server
 ## 1. [Introduction](#Introduction)
 ## 2. [Usage](#Usage)
 ## 3. [Fundamentals](#Fundamentals)
-  ### 3.1 [Core](#Server Core)
-  ### 3.2 [Configuration](#Server Setup/Configuration)
+  ### 3.1 [Core](#Server-Core)
+  ### 3.2 [Configuration](#Server-setup/Configuration)
   ### 3.3 [CGI](#CGI)
 
 ## Introduction
@@ -41,11 +41,17 @@ Warning: `Makefile` is configured for `Linux` use only.
 ## Fundamentals
 
 ### Server Core
+Building a web server involves two pivotal concepts: **robustness** and **efficiency**.
+
+Firstly, robustness is paramount to prevent clients from unintentionally compromising the web server with erroneous requests. Protecting against such incidents is crucial to safeguard personal data and ensure consistent server availability. Throughout the project, we diligently integrated this concept, notably in the realm of HTTP connection management. As depicted here, we adopted the paradigm of short-lived connections, terminating the connection to the client after each request. While this incurs a minor performance cost, it fortifies security by preventing prolonged waits for client requests. This strategy demonstrated its efficacy, achieving an impressive 100% accuracy in benchmarks using siege.
+
+Secondly, a web server must efficiently handle numerous concurrent requests from diverse clients, minimizing the time spent waiting for responses. This necessitates the incorporation of non-blocking commands and I/O Multiplexing, implemented through the utilization of the poll function. I/O Multiplexing enables the simultaneous monitoring of multiple file descriptors for reading data (client requests) and efficiently reading from each without waiting for one to finish before proceeding to the next. This crucial concept, exemplified by its application in modern server architectures, ensures optimal performance in today's dynamic web environments.
 
 ### Server Setup/Configuration
-Our webserver was required to run multiple (virtual) webservers on different IP Adresses and Ports. To run multipple virtual servers, include multiple server{} sections.
-Additionally the user can apply many customizations to the webserver via the config file. It's format is close to NGINX config file.
-The following configurations can be made:
+Upon launching the webserver reads in a specified configuration file or a default configration file, if none was provided. 
+This configuration file lets the user control many important aspects of the servers runtime, such as its IP and port. 
+But also the "locations" are an important part that allow us to specify specific operations for paths/files requested by the client.
+The following two tables list and explain all configurations that can be made.
 
 #### General configuration
 
@@ -68,23 +74,7 @@ Locations provide a way of setting secific options for request paths by the clie
 |return|/root|redirection of request|none|
 |index|page.html|set a default file to answer if the request is a directory (mutually exclusive to autoindex)|none|
 
-#### CGI
-If the user wants to include a CGI, this has to be specified as a location. For example:
-```
- location .php {
-		allow_methods GET POST;
-		root ./cgi-bin;
-		cgi_path usr/bin/php;
-	}
-```
-```
-	location .py {
-		allow_methods GET POST;
-		root ./cgi-bin;
-		cgi_path usr/bin/php;
-	}
-```
-where the user can specify the path of the cgi-program (cgi-path), as well as from which folder a script will be executed (root).
+Generally the configuration logic is very close to NGINX's keywords and functionalities. An example of a configuration file can be found at /configs.
 
 ### CGI
 
