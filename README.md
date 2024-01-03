@@ -7,7 +7,9 @@ This 42 project is about writing your own **HyperText Transfer Protocol** server
 ## 1. [Introduction](#Introduction)
 ## 2. [Usage](#Usage)
 ## 3. [Fundamentals](#Fundamentals)
-  ### 3.1 [CGI](#CGI)
+  ### 3.1 [Core](#Server Core)
+  ### 3.2 [Configuration](#Server Setup/Configuration)
+  ### 3.3 [CGI](#CGI)
 
 ## Introduction
 
@@ -37,6 +39,52 @@ Warning: `Makefile` is configured for `Linux` use only.
 > - To shut the server down, use `Ctrl` + `C`
 
 ## Fundamentals
+
+### Server Core
+
+### Server Setup/Configuration
+Our webserver was required to run multiple (virtual) webservers on different IP Adresses and Ports. To run multipple virtual servers, include multiple server{} sections.
+Additionally the user can apply many customizations to the webserver via the config file. It's format is close to NGINX config file.
+The following configurations can be made:
+
+#### General configuration
+
+|Key|Example| Description|Default value|
+|-|-|-|-|
+|listen| 8000 | Defines a port. Multiple ports have to be separated by spaces | Mandatory
+|host|127.0.0.1|Defines the host IP|Mandatory|
+|root|www/|Defines the default directory where to search for files|Mandatory|
+|server_name|my_website|Gives an internal name to the server|server_{1}|
+|client_max_body_size|1000000|sets the maximum size for the body of the client|300000|
+|error_page|404 fun/404.html (405 fun2/405.html)|sets the default path for an error page|error_page/xxx.html|
+|location|/ {OPTIONS}|One or more routes can be specified, that configure options for requests to that path|location for “/”|
+
+#### Locations
+Locations provide a way of setting secific options for request paths by the client such as redirections, allowing methods etc...
+|Key|Example| Description|Default value|
+|-|-|-|-|
+|allow_methods|GET POST DELETE|Set the allowed method for a client request|GET POST DELETE|
+|autoindex|on|autoindex directive processes requests ending with the slash character (‘/’) and produces a directory listing|off|
+|return|/root|redirection of request|none|
+|index|page.html|set a default file to answer if the request is a directory (mutually exclusive to autoindex)|none|
+
+#### CGI
+If the user wants to include a CGI, this has to be specified as a location. For example:
+```
+ location .php {
+		allow_methods GET POST;
+		root ./cgi-bin;
+		cgi_path usr/bin/php;
+	}
+```
+```
+	location .py {
+		allow_methods GET POST;
+		root ./cgi-bin;
+		cgi_path usr/bin/php;
+	}
+```
+where the user can specify the path of the cgi-program (cgi-path), as well as from which folder a script will be executed (root).
 
 ### CGI
 
